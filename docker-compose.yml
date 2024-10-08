@@ -1,0 +1,5 @@
+services:
+  phpstan:
+    image: ghcr.io/phpstan/phpstan:1-php8.3
+    volumes:
+      - .:/app

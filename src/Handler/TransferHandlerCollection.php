@@ -24,7 +24,7 @@ class TransferHandlerCollection implements Iterator
     private int $position = 0;
 
     /**
-     * @param Countable&Iterator<TransferHandlerInterface>|array<TransferHandlerInterface> $handlers
+     * @param (Countable&Iterator<TransferHandlerInterface>)|array<TransferHandlerInterface> $handlers
      */
     public function __construct((Countable&Iterator)|array $handlers)
     {

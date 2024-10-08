@@ -24,7 +24,7 @@ class RequestMutationHandlerCollection implements Iterator
     private int $position = 0;
 
     /**
-     * @param Countable&Iterator<RequestMutationHandlerInterface>|array<RequestMutationHandlerInterface> $handlers
+     * @param (Countable&Iterator<RequestMutationHandlerInterface>)|array<RequestMutationHandlerInterface> $handlers
      */
     public function __construct((Countable&Iterator)|array $handlers)
     {

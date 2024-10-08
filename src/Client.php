@@ -139,7 +139,7 @@ class Client implements ClientInterface
                 }
                 $headerName = strtolower(trim($headerArray[0]));
                 if (!str_contains($headerArray[1], ',')) {
-                    $this->responseHeaders[$headerName] = trim($headerArray[1]);
+                    $this->responseHeaders[$headerName] = [trim($headerArray[1])];
                     return $len;
                 }
                 $this->responseHeaders[$headerName] = array_map(
