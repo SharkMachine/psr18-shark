@@ -28,7 +28,7 @@ use SharkMachine\Psr18Shark\Handler\TransferHandlerCollection;
 use SharkMachine\Psr18Shark\Testing\TestCase;
 
 #[CoversClass(RedirectTransferHandler::class)]
-class RedirectTransferHandlerTest extends TestCase
+final class RedirectTransferHandlerTest extends TestCase
 {
     /**
      * @param int $statusCode
