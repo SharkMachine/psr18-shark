@@ -69,6 +69,7 @@ class Client implements ClientInterface
      * @return ResponseInterface
      *
      * @throws ClientExceptionInterface
+     * @throws Throwable
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
@@ -88,6 +89,8 @@ class Client implements ClientInterface
                 foreach ($this->transferHandlerCollection as $handler) {
                     $handler->handleException($ex);
                 }
+            } else {
+                throw $ex;
             }
         }
         if (!isset($response)) {
