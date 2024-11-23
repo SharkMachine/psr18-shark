@@ -197,6 +197,7 @@ class Client implements ClientInterface
             }
             curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
         }
+        /** @phpstan-ignore argument.type */ // Method is a non-empty string
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->getmethod());
         $requestBody = (string)$request->getBody();
         if ('' !== $requestBody) {

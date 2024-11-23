@@ -4,7 +4,8 @@ Semantic versioning 2.0 is followed.
 
 # 1.0.0
 
-Initial release
+- Initial release
+- PHP 8.4 support
 
 # 1.0.0-beta2
 
