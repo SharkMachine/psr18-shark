@@ -18,7 +18,7 @@ $client = new Client($factory, $factory);
 // The returned object is a PSR-7 request. Read more about it at https://www.php-fig.org/psr/psr-7/
 $request = $factory->createRequest('POST', 'https://request-uri');
 
-// You van add headers and request body here
+// You can add headers and request body here
 $request->getBody()->write('Message');
 $request = $request->withHeader('X-MyHeader', 'Data');
 
