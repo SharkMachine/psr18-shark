@@ -2,6 +2,10 @@
 
 Semantic versioning 2.0 is followed.
 
+# 1.0.0
+
+Initial release
+
 # 1.0.0-beta2
 
 - Fixed exception handling in client.
