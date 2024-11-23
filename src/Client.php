@@ -73,7 +73,7 @@ class Client implements ClientInterface
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        if ($this->requestMutationHandlerCollection) {
+        if (null !== $this->requestMutationHandlerCollection) {
             foreach ($this->requestMutationHandlerCollection as $handler) {
                 $request = $handler->handleRequest($request);
             }
@@ -85,7 +85,7 @@ class Client implements ClientInterface
             $response = $this->getResponse();
         } catch (Throwable $ex) {
             curl_close($this->curl);
-            if ($this->transferHandlerCollection) {
+            if (null !== $this->transferHandlerCollection) {
                 foreach ($this->transferHandlerCollection as $handler) {
                     $handler->handleException($ex);
                 }
@@ -96,7 +96,7 @@ class Client implements ClientInterface
         if (!isset($response)) {
             throw new NoResponseException(); // The exception handlers didn't throw when there was no response.
         }
-        if ($this->transferHandlerCollection) {
+        if (null !== $this->transferHandlerCollection) {
             foreach ($this->transferHandlerCollection as $handler) {
                 $response = $handler->handleResponse($this, $request, $response);
             }
@@ -186,7 +186,7 @@ class Client implements ClientInterface
      */
     protected function curlRequest(RequestInterface $request): void
     {
-        if ($request->getHeaders()) {
+        if (count($request->getHeaders()) > 0) {
             $headers = [];
             foreach ($request->getHeaders() as $headerName => $headerValues) {
                 $headers[] = sprintf(
@@ -198,7 +198,7 @@ class Client implements ClientInterface
             curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
         }
         /** @phpstan-ignore argument.type */ // Method is a non-empty string
-        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->getmethod());
+        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $request->getMethod());
         $requestBody = (string)$request->getBody();
         if ('' !== $requestBody) {
             curl_setopt($this->curl, CURLOPT_POSTFIELDS, $requestBody);
@@ -213,13 +213,13 @@ class Client implements ClientInterface
      */
     protected function getResponse(): ResponseInterface
     {
-        $statusCode = (int)curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+        $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $response   = $this->responseFactory->createResponse($statusCode);
         $response   = $response->withBody($this->streamFactory->createStream($this->dataStream));
         foreach ($this->responseHeaders as $headerName => $headerValue) {
             $response = $response->withHeader($headerName, $headerValue);
         }
-        if ($this->responseMutationHandlerCollection) {
+        if (null !== $this->responseMutationHandlerCollection) {
             foreach ($this->responseMutationHandlerCollection as $handler) {
                 $response = $handler->handleResponse($response);
             }
