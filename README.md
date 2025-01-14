@@ -15,10 +15,10 @@ composer require sharkmachine/psr18-shark
 
 ## Supported PHP versions
 
-| Library version | PHP 8.2 | PHP 8.3 | PHP 8.4  |
-|-----------------|---------|---------|----------|
-| Next major      | x (2.0) | ✓       | ✓        |
-| 1.x             | ✓       | ✓       | ✓        |
+| Library version  | PHP 8.2 | PHP 8.3 | PHP 8.4  |
+|------------------|---------|---------|----------|
+| Next major (2.0) | x       | ✓       | ✓        |
+| 1.x              | ✓       | ✓       | ✓        |
 
 ## Request mutation
 
