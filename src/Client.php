@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use SharkMachine\Psr18Shark\Exception\ClientException;
 use SharkMachine\Psr18Shark\Exception\CurlException;
 use SharkMachine\Psr18Shark\Exception\NoResponseException;
 use SharkMachine\Psr18Shark\Handler\RequestMutationHandlerCollection;
@@ -27,16 +28,6 @@ class Client implements ClientInterface
      * @var CurlHandle
      */
     private CurlHandle $curl;
-
-    /**
-     * @var string
-     */
-    private string $dataStream = '';
-
-    /**
-     * @var array<string, string[]>
-     */
-    private array $responseHeaders = [];
 
     /**
      * @param ResponseFactoryInterface               $responseFactory
@@ -79,10 +70,10 @@ class Client implements ClientInterface
             }
         }
 
-        $this->initCurl($request->getUri());
         try {
-            $this->curlRequest($request);
-            $response = $this->getResponse();
+            $responseData = $this->initCurl($request->getUri());
+            $this->curlRequest($request, $responseData);
+            $response = $this->getResponse($responseData);
         } catch (Throwable $ex) {
             curl_close($this->curl);
             if (null !== $this->transferHandlerCollection) {
@@ -111,11 +102,18 @@ class Client implements ClientInterface
     /**
      * @param UriInterface $uri
      *
-     * @return void
+     * @return ResponseData
+     *
+     * @throws ClientException
      */
-    protected function initCurl(UriInterface $uri): void
+    protected function initCurl(UriInterface $uri): ResponseData
     {
         $this->curl = curl_init((string)$uri);
+        $dataStream = fopen('php://temp', 'wb+');
+        if (false === $dataStream) {
+            throw new ClientException('Unable to open handle for response');
+        }
+        $responseData = new ResponseData($dataStream);
 
         // Do not follow redirects.
         curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, false);
@@ -124,9 +122,12 @@ class Client implements ClientInterface
         curl_setopt(
             $this->curl,
             CURLOPT_WRITEFUNCTION,
-            function (CurlHandle $curl, string $data): int {
-                $this->dataStream .= $data;
-                return strlen($data);
+            static function (CurlHandle $curl, string $data) use ($responseData): int {
+                $bytes = fwrite($responseData->streamHandle, $data);
+                if (false === $bytes) {
+                    return -1; // This will cause a cURL error
+                }
+                return $bytes;
             }
         );
 
@@ -134,7 +135,7 @@ class Client implements ClientInterface
         curl_setopt(
             $this->curl,
             CURLOPT_HEADERFUNCTION,
-            function (CurlHandle $curl, string $header): int {
+            static function (CurlHandle $curl, string $header) use ($responseData): int {
                 $len = strlen($header);
                 $headerArray = explode(':', $header, 2);
                 if (count($headerArray) < 2) {
@@ -142,10 +143,10 @@ class Client implements ClientInterface
                 }
                 $headerName = strtolower(trim($headerArray[0]));
                 if (!str_contains($headerArray[1], ',')) {
-                    $this->responseHeaders[$headerName] = [trim($headerArray[1])];
+                    $responseData->headers[$headerName] = [trim($headerArray[1])];
                     return $len;
                 }
-                $this->responseHeaders[$headerName] = array_map(
+                $responseData->headers[$headerName] = array_map(
                     'trim',
                     explode(',', $headerArray[1])
                 );
@@ -175,20 +176,20 @@ class Client implements ClientInterface
         if (!in_array(CURLOPT_USERAGENT, $this->curlOptions, true)) {
             curl_setopt($this->curl, CURLOPT_USERAGENT, self::DEFAULT_USER_AGENT);
         }
+
+        return $responseData;
     }
 
     /**
      * @param RequestInterface $request
+     * @param ResponseData     $responseData
      *
-     * @return void
+     * @return ResponseData
      *
      * @throws ClientExceptionInterface
      */
-    protected function curlRequest(RequestInterface $request): void
+    protected function curlRequest(RequestInterface $request, ResponseData $responseData): ResponseData
     {
-        $this->dataStream      = '';
-        $this->responseHeaders = [];
-
         if (count($request->getHeaders()) > 0) {
             $headers = [];
             foreach ($request->getHeaders() as $headerName => $headerValues) {
@@ -209,19 +210,23 @@ class Client implements ClientInterface
         if (false === curl_exec($this->curl)) {
             throw new CurlException(curl_error($this->curl));
         }
+        return $responseData;
     }
 
     /**
+     * @param ResponseData $responseData
+     *
      * @return ResponseInterface
      */
-    protected function getResponse(): ResponseInterface
+    protected function getResponse(ResponseData $responseData): ResponseInterface
     {
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $response   = $this->responseFactory->createResponse($statusCode);
-        $response   = $response->withBody($this->streamFactory->createStream($this->dataStream));
-        foreach ($this->responseHeaders as $headerName => $headerValue) {
+        $response   = $response->withBody($this->streamFactory->createStreamFromResource($responseData->streamHandle));
+        foreach ($responseData->headers as $headerName => $headerValue) {
             $response = $response->withHeader($headerName, $headerValue);
         }
+        $response->getBody()->rewind();
         if (null !== $this->responseMutationHandlerCollection) {
             foreach ($this->responseMutationHandlerCollection as $handler) {
                 $response = $handler->handleResponse($response);

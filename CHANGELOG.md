@@ -2,6 +2,10 @@
 
 Semantic versioning 2.0 is followed.
 
+# 1.1.0
+
+- Use php://temp stream wrapper for storing responses
+
 # 1.0.1
 
 - Streamed response body and headers were not cleared for every request
