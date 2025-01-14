@@ -7,6 +7,12 @@ The following design choices have been made:
 - The client doesn't follow redirects. You need to either handle it in the code yourself or use `RedirectTransferHandler`.
 - The client doesn't throw any exceptions unless there is a curl error. If you need handling for HTTP 4xx or 5xx status codes, you either need to implement it yourself or use `ThrowOnErrorTransferHandler`.
 
+## Installation
+
+```bash
+composer require sharkmachine/psr18-shark
+```
+
 ## Request mutation
 
 If you need to change the request before it is sent without relying on PSR-18 functionality, you can create mutation handlers for it. `$requestMutationHandlerCollection` constructor parameter is used to pass a collection of handlers to the client.
