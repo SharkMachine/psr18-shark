@@ -186,6 +186,9 @@ class Client implements ClientInterface
      */
     protected function curlRequest(RequestInterface $request): void
     {
+        $this->dataStream      = '';
+        $this->responseHeaders = [];
+
         if (count($request->getHeaders()) > 0) {
             $headers = [];
             foreach ($request->getHeaders() as $headerName => $headerValues) {
