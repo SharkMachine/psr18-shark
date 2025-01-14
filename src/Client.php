@@ -142,14 +142,7 @@ class Client implements ClientInterface
                     return $len;
                 }
                 $headerName = strtolower(trim($headerArray[0]));
-                if (!str_contains($headerArray[1], ',')) {
-                    $responseData->headers[$headerName] = [trim($headerArray[1])];
-                    return $len;
-                }
-                $responseData->headers[$headerName] = array_map(
-                    'trim',
-                    explode(',', $headerArray[1])
-                );
+                $responseData->headers[$headerName] = [trim($headerArray[1])];
 
                 return $len;
             }
