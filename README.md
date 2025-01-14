@@ -13,6 +13,13 @@ The following design choices have been made:
 composer require sharkmachine/psr18-shark
 ```
 
+## Supported PHP versions
+
+| Library version | PHP 8.2 | PHP 8.3 | PHP 8.4  |
+|-----------------|---------|---------|----------|
+| Next major      | x (2.0) | ✓       | ✓        |
+| 1.x             | ✓       | ✓       | ✓        |
+
 ## Request mutation
 
 If you need to change the request before it is sent without relying on PSR-18 functionality, you can create mutation handlers for it. `$requestMutationHandlerCollection` constructor parameter is used to pass a collection of handlers to the client.
