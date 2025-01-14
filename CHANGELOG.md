@@ -4,6 +4,7 @@ Semantic versioning 2.0 is followed.
 
 # 1.1.0
 
+- PHP 8.2 support
 - Use php://temp stream wrapper for storing responses
 - Response headers were not parsed correctly
 

@@ -22,7 +22,7 @@ use Throwable;
 
 class Client implements ClientInterface
 {
-    private const string DEFAULT_USER_AGENT = 'PSR-18 Shark Client';
+    private const DEFAULT_USER_AGENT = 'PSR-18 Shark Client';
 
     /**
      * @var CurlHandle
