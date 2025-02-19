@@ -15,6 +15,7 @@ use Psr\Http\Message\UriInterface;
 use SharkMachine\Psr18Shark\Exception\ClientException;
 use SharkMachine\Psr18Shark\Exception\CurlException;
 use SharkMachine\Psr18Shark\Exception\NoResponseException;
+use SharkMachine\Psr18Shark\Exception\SendRequestException;
 use SharkMachine\Psr18Shark\Handler\RequestMutationHandlerCollection;
 use SharkMachine\Psr18Shark\Handler\ResponseMutationHandlerCollection;
 use SharkMachine\Psr18Shark\Handler\TransferHandlerCollection;
@@ -60,7 +61,6 @@ class Client implements ClientInterface
      * @return ResponseInterface
      *
      * @throws ClientExceptionInterface
-     * @throws Throwable
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
@@ -81,7 +81,7 @@ class Client implements ClientInterface
                     $handler->handleException($ex);
                 }
             } else {
-                throw $ex;
+                throw new SendRequestException($ex);
             }
         }
         if (!isset($response)) {
