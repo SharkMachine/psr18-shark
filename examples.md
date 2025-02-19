@@ -25,3 +25,19 @@ $request = $request->withHeader('X-MyHeader', 'Data');
 // Send the request to get the response. The response is a PSR-7 response.
 $response = $client->sendRequest($request);
 ```
+
+## NTLM authentication
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use SharkMachine\Psr18Shark\Client;
+
+$ntlmAuth = [
+    CURLOPT_HTTPAUTH => CURLAUTH_NTLM,
+    CURLOPT_USERPWD  => 'username:password',
+];
+$client = new Client($factory, $factory, curlOptions: $ntlmAuth);
+```

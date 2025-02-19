@@ -47,3 +47,12 @@ You can pass custom curl options to the client with `$curlOptions` constructor p
 - `CURLOPT_HEADER` - Headers are set in the request.
 - `CURLOPT_WRITEFUNCTION` - The client uses this to get the response body.
 - `CURLOPT_HEADERFUNCTION` - The client uses this to get the response headers.
+
+## How do I implement NTLM authentication?
+
+Microsoft is phasing out NTLM. For this reason, NTLM authentication won't be implemented in this library. However, it should be possible with the following curl options:
+
+- `CURLOPT_HTTPAUTH` as `CURLAUTH_NTLM`
+- `CURLOPT_USERPWD` with username and password, for example "username:password"
+
+Check [examples.md](examples.md) for an example.
